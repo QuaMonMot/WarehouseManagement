@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="TextFile1.txt" />
+  </Folder>
   <Project Path="Warehouse.API/Warehouse.API.csproj" />
   <Project Path="Warehouse.BLL/Warehouse.BLL.csproj" />
   <Project Path="Warehouse.DAL/Warehouse.DAL.csproj" />
