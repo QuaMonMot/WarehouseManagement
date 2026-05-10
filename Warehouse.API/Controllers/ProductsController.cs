@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Warehouse.BLL.Interfaces;
 using Warehouse.Models;
-
+using Warehouse.Models.DTOs;
 namespace Warehouse.API.Controllers
 {
     [ApiController]
@@ -45,26 +45,77 @@ namespace Warehouse.API.Controllers
         // THÊM SẢN PHẨM
         // =========================
         [HttpPost]
-
         [EndpointSummary("Thêm sản phẩm")]
-        public IActionResult Add(Product product)
-        {
-            _productService.Add(product);
 
-            return Ok("Add success");
+        public IActionResult Add(
+         [FromBody] CreateProductDTO dto
+ )
+        {
+            try
+            {
+                Product product = new Product
+                {
+                    SKU = dto.SKU,
+
+                    ProductName = dto.ProductName,
+
+                    Quantity = dto.Quantity,
+
+                    Price = dto.Price,
+
+                    MinStock = dto.MinStock,
+
+                    SupplierId = dto.SupplierId
+                };
+
+                _productService.Add(product);
+
+                return Ok("Add success");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // =========================
         // SỬA SẢN PHẨM
         // =========================
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Product product)
+        [EndpointSummary("Sửa sản phẩm")]
+
+        public IActionResult Update(
+            int id,
+            [FromBody] UpdateProductDTO dto
+)
         {
-            product.ProductId = id;
+            try
+            {
+                Product product = new Product
+                {
+                    ProductId = id,
 
-            _productService.Update(product);
+                    SKU = dto.SKU,
 
-            return Ok("Update success");
+                    ProductName = dto.ProductName,
+
+                    Quantity = dto.Quantity,
+
+                    Price = dto.Price,
+
+                    MinStock = dto.MinStock,
+
+                    SupplierId = dto.SupplierId
+                };
+
+                _productService.Update(product);
+
+                return Ok("Update success");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // =========================

@@ -1,8 +1,8 @@
 ﻿using Warehouse.Models;
 
-namespace Warehouse.DAL.Interfaces
+namespace Warehouse.BLL.Interfaces
 {
-    public interface ISupplierRepository
+    public interface ISupplierService
     {
         List<Supplier> GetAll();
 

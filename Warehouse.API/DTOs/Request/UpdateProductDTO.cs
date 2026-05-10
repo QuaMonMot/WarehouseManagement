@@ -1,6 +1,6 @@
 ﻿namespace Warehouse.Models.DTOs
 {
-    public class CreateProductDTO
+    public class UpdateProductDTO
     {
         public string SKU { get; set; }
 

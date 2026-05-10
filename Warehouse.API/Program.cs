@@ -4,6 +4,7 @@ using Warehouse.DAL.Interfaces;
 using Warehouse.DAL.Repositories;
 using Warehouse.BLL.Services;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -25,12 +26,16 @@ builder.Services.AddScoped<SqlConnectionFactory>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped< ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<IStockRepository,StockRepository>();
+
 
 // Service
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddScoped<IReportService, ReportService>();
-
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IStockService, StockService>();
 
 var app = builder.Build();
 

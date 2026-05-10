@@ -37,6 +37,7 @@ namespace Warehouse.DAL.Repositories
                     products.Add(new Product
                     {
                         ProductId = Convert.ToInt32(reader["ProductId"]),
+                        SKU = reader["SKU"].ToString(),
                         ProductName = reader["ProductName"].ToString(),
                         Quantity = Convert.ToInt32(reader["Quantity"]),
                         Price = Convert.ToDecimal(reader["Price"]),
@@ -60,6 +61,7 @@ namespace Warehouse.DAL.Repositories
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("@ProductName", product.ProductName);
+                cmd.Parameters.AddWithValue("@SKU", product.SKU);
                 cmd.Parameters.AddWithValue("@Quantity", product.Quantity);
                 cmd.Parameters.AddWithValue("@Price", product.Price);
                 cmd.Parameters.AddWithValue("@MinStock", product.MinStock);
@@ -85,6 +87,7 @@ namespace Warehouse.DAL.Repositories
                 cmd.Parameters.AddWithValue("@ProductId", product.ProductId);
 
                 cmd.Parameters.AddWithValue("@ProductName", product.ProductName);
+                cmd.Parameters.AddWithValue("@SKU", product.SKU);
 
                 cmd.Parameters.AddWithValue("@Quantity", product.Quantity);
 
@@ -140,10 +143,17 @@ namespace Warehouse.DAL.Repositories
                     product = new Product
                     {
                         ProductId = Convert.ToInt32(reader["ProductId"]),
+
+                        SKU = reader["SKU"].ToString(),
+
                         ProductName = reader["ProductName"].ToString(),
+
                         Quantity = Convert.ToInt32(reader["Quantity"]),
+
                         Price = Convert.ToDecimal(reader["Price"]),
+
                         MinStock = Convert.ToInt32(reader["MinStock"]),
+
                         SupplierId = Convert.ToInt32(reader["SupplierId"])
                     };
                 }

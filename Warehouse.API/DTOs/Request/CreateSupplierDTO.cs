@@ -1,9 +1,7 @@
-﻿namespace Warehouse.Models
+﻿namespace Warehouse.Models.DTOs
 {
-    public class Supplier
+    public class CreateSupplierDTO
     {
-        public int SupplierId { get; set; }
-
         public string SupplierCode { get; set; }
 
         public string SupplierName { get; set; }
