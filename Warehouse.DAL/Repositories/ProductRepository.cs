@@ -45,11 +45,27 @@ namespace Warehouse.DAL.Repositories
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@Name", p.ProductName);
                 cmd.Parameters.AddWithValue("@CategoryId", p.CategoryId);
-                cmd.Parameters.AddWithValue("@Unit", p.Unit);
+                cmd.Parameters.AddWithValue("@Unit", p.Unit ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@Price", p.Price);
 
                 conn.Open();
-                return cmd.ExecuteNonQuery() > 0;
+                // Thay vì ExecuteNonQuery, hãy dùng ExecuteScalar để lấy số 1 từ Procedure trả về
+                var result = cmd.ExecuteScalar();
+                return result != null && Convert.ToInt32(result) == 1;
+            }
+        }
+        public bool Export(int userId, int productId, int qty)
+        {
+            using (var conn = _db.GetConnection())
+            {
+                var cmd = new SqlCommand("sp_ExportProduct", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@UserId", userId);
+                cmd.Parameters.AddWithValue("@ProductId", productId);
+                cmd.Parameters.AddWithValue("@Quantity", qty);
+
+                conn.Open();
+                return Convert.ToInt32(cmd.ExecuteScalar()) == 1;
             }
         }
     }

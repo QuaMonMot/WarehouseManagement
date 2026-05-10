@@ -18,7 +18,7 @@ namespace Warehouse.Models
         public string ProductName { get; set; }
 
         public int CategoryId { get; set; }
-        public string CategoryName { get; set; }
+        public string? CategoryName { get; set; }
 
         [Required]
         public string Unit { get; set; }
@@ -28,7 +28,7 @@ namespace Warehouse.Models
 
         // Thuộc tính điều hướng về Category
         [ForeignKey("CategoryId")]
-        public virtual Category Category { get; set; }
+        public virtual Category? Category { get; set; }
     }
 }
     

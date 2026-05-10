@@ -29,7 +29,22 @@ namespace Warehouse.DAL.Repositories
                 return cmd.ExecuteNonQuery() > 0;
             }
         }
+        public bool Export(int userId, int productId, int quantity)
+        {
+            using (var conn = _db.GetConnection())
+            {
+                var cmd = new SqlCommand("sp_ExportProduct", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
 
+                cmd.Parameters.AddWithValue("@UserId", userId);
+                cmd.Parameters.AddWithValue("@ProductId", productId);
+                cmd.Parameters.AddWithValue("@Qty", quantity); // Đã sửa từ bước trước
+                conn.Open();
+                var result = cmd.ExecuteScalar();
+                return result != null && Convert.ToInt32(result) == 1;
+            }
+        }
+        
         // Gọi SP Cảnh báo tồn kho
         public DataTable GetLowStockAlert(int threshold)
         {

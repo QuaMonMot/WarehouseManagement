@@ -30,22 +30,15 @@ namespace Warehouse.BLL.Services
 
         public string AddProduct(Product p)
         {
-            // Kiểm tra nghiệp vụ
-            if (string.IsNullOrWhiteSpace(p.ProductName))
-                return "Tên sản phẩm không được để trống.";
-            if (p.Price < 0)
-                return "Giá sản phẩm không được là số âm.";
-            if (p.CategoryId <= 0)
-                return "Vui lòng chọn danh mục hợp lệ.";
-
             try
             {
                 bool success = _productRepo.Insert(p);
-                return success ? "Thêm sản phẩm và khởi tạo kho thành công!" : "Lỗi khi thêm sản phẩm.";
+                return success ? "Thành công" : "Lỗi: Repository trả về false (kiểm tra lại logic DAL).";
             }
             catch (Exception ex)
             {
-                return "Lỗi hệ thống: " + ex.Message;
+                // Dòng này cực kỳ quan trọng, nó sẽ hiện lỗi như "Login failed" hoặc "Table not found"
+                return "Lỗi hệ thống chi tiết: " + ex.Message;
             }
         }
     }

@@ -11,6 +11,7 @@ namespace Warehouse.BLL.Interfaces
     {
         // Nhập kho
         string ImportGoods(int supplierId, int userId, int productId, int qty, decimal price);
+        string ExportGoods(int userId, int productId, int quantity);
 
         // Cảnh báo tồn kho thấp (Trả về DataTable hoặc List tùy bạn)
         DataTable GetLowStockAlert(int threshold);

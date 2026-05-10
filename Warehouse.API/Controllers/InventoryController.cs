@@ -20,6 +20,22 @@ namespace Warehouse.API.Controllers
             var result = _inventoryService.ImportGoods(supplierId, userId, productId, qty, price);
             return Ok(result);
         }
+        [HttpPost("export")]
+        public IActionResult ExportGoods(int userId, int productId, int quantity)
+        {
+            try
+            {
+                // Giả sử bạn đã viết Interface IInventoryService và hàm ExportGoods tương ứng
+                var result = _inventoryService.ExportGoods(userId, productId, quantity);
+                if (result.Contains("thành công")) return Ok(result);
+                return BadRequest(result);
+            }
+            catch (System.Exception ex)
+            {
+                // Trả về lỗi chi tiết nếu kho không đủ hàng
+                return BadRequest(ex.Message);
+            }
+        }
 
         [HttpGet("low-stock")]
         public IActionResult GetLowStock(int threshold = 10)

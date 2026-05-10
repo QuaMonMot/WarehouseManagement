@@ -40,6 +40,25 @@ namespace Warehouse.BLL.Services
                 return "Lỗi hệ thống: " + ex.Message;
             }
         }
+        public string ExportGoods(int userId, int productId, int quantity)
+        {
+            // 1. Kiểm tra nghiệp vụ cơ bản
+            if (quantity <= 0) return "Số lượng xuất phải lớn hơn 0.";
+
+            try
+            {
+                // 2. Gọi xuống Repository để thực thi Procedure
+                // Lưu ý: Đảm bảo bạn đã viết hàm Export trong InventoryRepository như mình chỉ ở tin nhắn trước
+                bool success = _inventoryRepo.Export(userId, productId, quantity);
+
+                return success ? "Xuất kho thành công!" : "Lỗi khi thực hiện xuất kho.";
+            }
+            catch (Exception ex)
+            {
+                // Trả về lỗi chi tiết (Ví dụ: "Số lượng trong kho không đủ để xuất!")
+                return ex.Message;
+            }
+        }
 
         // 2. Logic Cảnh báo tồn kho thấp
         public DataTable GetLowStockAlert(int threshold)

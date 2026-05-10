@@ -25,8 +25,14 @@ namespace Warehouse.API.Controllers
         public IActionResult Create(Product product)
         {
             var result = _productService.AddProduct(product);
-            if (result.Contains("thành công")) return Ok(result);
-            return BadRequest(result);
+
+            // Check không phân biệt hoa thường hoặc check nội dung khớp
+            if (result == "Thành công")
+            {
+                return Ok(result); // Swagger sẽ hiện màu xanh 200 OK
+            }
+
+            return BadRequest(result); // Chỉ hiện 400 khi thực sự có lỗi
         }
     }
 }
