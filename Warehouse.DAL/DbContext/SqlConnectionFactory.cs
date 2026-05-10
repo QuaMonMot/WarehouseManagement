@@ -1,12 +1,21 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data;
+using System.Data.SqlClient;
 
-namespace Warehouse.DAL.DbContext
+namespace Warehouse.DAL
 {
-    public class SqlConnectionFactory
+    public class DatabaseHelper
     {
         private readonly string _connectionString;
-        public SqlConnectionFactory(string connectionString) => _connectionString = connectionString;
 
-        public SqlConnection CreateConnection() => new SqlConnection(_connectionString);
+        // QUAN TRỌNG: Thêm hàm khởi tạo nhận tham số này vào
+        public DatabaseHelper(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+
+        public SqlConnection GetConnection()
+        {
+            return new SqlConnection(_connectionString);
+        }
     }
 }

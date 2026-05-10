@@ -1,7 +1,9 @@
 ﻿namespace Warehouse.Models
 {
-    public class BaseEntity
+    public abstract class BaseEntity
     {
-
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
+        public bool IsDeleted { get; set; } = false; // Phục vụ xóa mềm
     }
 }
