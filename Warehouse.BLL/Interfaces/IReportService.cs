@@ -1,6 +1,6 @@
-﻿namespace Warehouse.BLL
+﻿namespace Warehouse.BLL.Interfaces
 {
-    public class Class1
+    public interface IReportService
     {
 
     }

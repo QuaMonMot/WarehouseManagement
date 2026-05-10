@@ -1,6 +1,6 @@
-﻿namespace Warehouse.DAL
+﻿namespace Warehouse.DAL.Interfaces
 {
-    public class Class1
+    public interface IStockRepository
     {
 
     }

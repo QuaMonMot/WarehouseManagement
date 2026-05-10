@@ -1,15 +1,15 @@
 ﻿using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Warehouse.DAL.DbContext;
+using Warehouse.DAL.Interfaces;
 
 namespace Warehouse.DAL.Repositories
 {
-    public class StockRepository
+    public class StockRepository : IStockRepository
     {
         private readonly SqlConnectionFactory _db;
         public StockRepository(SqlConnectionFactory db) => _db = db;
 
-        // Hàm cập nhật tồn kho bằng ADO.NET
         public async Task<bool> UpdateStockAsync(int productId, int quantityChange)
         {
             using var conn = _db.CreateConnection();

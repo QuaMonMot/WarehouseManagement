@@ -1,6 +1,8 @@
-﻿namespace Warehouse.DAL
+﻿using Warehouse.DAL.Interfaces;
+
+namespace Warehouse.DAL.Repositories
 {
-    public class Class1
+    public class SupplierRepository : ISupplierRepository
     {
 
     }
