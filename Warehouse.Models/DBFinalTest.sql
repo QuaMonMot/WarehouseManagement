@@ -108,7 +108,32 @@ CREATE TABLE StockLogs
     REFERENCES Products(ProductId)
 )
 GO
+-- =============================================
+-- BẢNG USer
+-- =============================================
+CREATE TABLE Users
+(
+    UserId INT PRIMARY KEY IDENTITY(1,1),
 
+    Username NVARCHAR(100) UNIQUE NOT NULL,
+
+    Password NVARCHAR(100) NOT NULL,
+
+    Role NVARCHAR(50) NOT NULL
+)
+GO
+
+INSERT INTO Users
+(
+    Username,
+    Password,
+    Role
+)
+VALUES
+('admin', '123', 'Admin'),
+
+('staff', '123', 'Staff')
+GO
 -- =============================================
 -- THÊM NHÀ CUNG CẤP
 -- =============================================
