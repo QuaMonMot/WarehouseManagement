@@ -148,7 +148,14 @@ namespace Warehouse.DAL.Repositories
                         MinStock =
                             Convert.ToInt32(
                                 reader["MinStock"]
-                            )
+                            ),
+
+                        SupplierId =
+                            reader["SupplierId"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(
+                                    reader["SupplierId"]
+                                )
                     });
                 }
             }
@@ -293,29 +300,42 @@ namespace Warehouse.DAL.Repositories
 
                 if (reader.Read())
                 {
+                    HashSet<string> columns =
+                        GetColumnNames(reader);
+
                     dashboard.TotalProducts =
-                        Convert.ToInt32(
-                            reader["TotalProducts"]
+                        GetInt32OrDefault(
+                            reader,
+                            columns,
+                            "TotalProducts"
                         );
 
                     dashboard.TotalStock =
-                        Convert.ToInt32(
-                            reader["TotalStock"]
+                        GetInt32OrDefault(
+                            reader,
+                            columns,
+                            "TotalStock"
                         );
 
                     dashboard.LowStockProducts =
-                        Convert.ToInt32(
-                            reader["LowStockProducts"]
+                        GetInt32OrDefault(
+                            reader,
+                            columns,
+                            "LowStockProducts"
                         );
 
                     dashboard.TotalImport =
-                        Convert.ToInt32(
-                            reader["TotalImport"]
+                        GetInt32OrDefault(
+                            reader,
+                            columns,
+                            "TotalImport"
                         );
 
                     dashboard.TotalExport =
-                        Convert.ToInt32(
-                            reader["TotalExport"]
+                        GetInt32OrDefault(
+                            reader,
+                            columns,
+                            "TotalExport"
                         );
                 }
             }
@@ -379,7 +399,14 @@ namespace Warehouse.DAL.Repositories
                         MinStock =
                             Convert.ToInt32(
                                 reader["MinStock"]
-                            )
+                            ),
+
+                        SupplierId =
+                            reader["SupplierId"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(
+                                    reader["SupplierId"]
+                                )
                     });
                 }
             }
@@ -443,7 +470,19 @@ namespace Warehouse.DAL.Repositories
                         Price =
                             Convert.ToDecimal(
                                 reader["Price"]
-                            )
+                            ),
+
+                        MinStock =
+                            Convert.ToInt32(
+                                reader["MinStock"]
+                            ),
+
+                        SupplierId =
+                            reader["SupplierId"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(
+                                    reader["SupplierId"]
+                                )
                     });
                 }
             }
@@ -495,6 +534,34 @@ namespace Warehouse.DAL.Repositories
             }
 
             return reports;
+        }
+
+        private static HashSet<string> GetColumnNames(SqlDataReader reader)
+        {
+            HashSet<string> columns =
+                new(StringComparer.OrdinalIgnoreCase);
+
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                columns.Add(reader.GetName(i));
+            }
+
+            return columns;
+        }
+
+        private static int GetInt32OrDefault(
+            SqlDataReader reader,
+            HashSet<string> columns,
+            string columnName
+        )
+        {
+            if (!columns.Contains(columnName)
+                || reader[columnName] == DBNull.Value)
+            {
+                return 0;
+            }
+
+            return Convert.ToInt32(reader[columnName]);
         }
     }
 }

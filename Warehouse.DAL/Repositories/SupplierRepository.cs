@@ -176,7 +176,12 @@ namespace Warehouse.DAL.Repositories
 
                 conn.Open();
 
-                cmd.ExecuteNonQuery();
+                int affectedRows = cmd.ExecuteNonQuery();
+
+                if (affectedRows == 0)
+                {
+                    throw new KeyNotFoundException("Supplier not found");
+                }
             }
         }
 
@@ -201,7 +206,12 @@ namespace Warehouse.DAL.Repositories
 
                 conn.Open();
 
-                cmd.ExecuteNonQuery();
+                int affectedRows = cmd.ExecuteNonQuery();
+
+                if (affectedRows == 0)
+                {
+                    throw new KeyNotFoundException("Supplier not found");
+                }
             }
         }
     }

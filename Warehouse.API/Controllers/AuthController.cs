@@ -73,6 +73,9 @@ namespace Warehouse.API.Controllers
                 new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(
                         _configuration["Jwt:Key"]
+                        ?? throw new InvalidOperationException(
+                            "Jwt:Key is not configured"
+                        )
                     )
                 );
 

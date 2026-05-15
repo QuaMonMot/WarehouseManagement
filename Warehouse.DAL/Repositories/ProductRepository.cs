@@ -41,7 +41,10 @@ namespace Warehouse.DAL.Repositories
                         ProductName = reader["ProductName"].ToString(),
                         Quantity = Convert.ToInt32(reader["Quantity"]),
                         Price = Convert.ToDecimal(reader["Price"]),
-                        MinStock = Convert.ToInt32(reader["MinStock"])
+                        MinStock = Convert.ToInt32(reader["MinStock"]),
+                        SupplierId = reader["SupplierId"] == DBNull.Value
+                            ? 0
+                            : Convert.ToInt32(reader["SupplierId"])
                     });
                 }
             }
@@ -99,7 +102,12 @@ namespace Warehouse.DAL.Repositories
 
                 conn.Open();
 
-                cmd.ExecuteNonQuery();
+                int affectedRows = cmd.ExecuteNonQuery();
+
+                if (affectedRows == 0)
+                {
+                    throw new KeyNotFoundException("Product not found");
+                }
             }
         }
 
@@ -118,7 +126,12 @@ namespace Warehouse.DAL.Repositories
 
                 conn.Open();
 
-                cmd.ExecuteNonQuery();
+                int affectedRows = cmd.ExecuteNonQuery();
+
+                if (affectedRows == 0)
+                {
+                    throw new KeyNotFoundException("Product not found");
+                }
             }
         }
         public Product GetById(int id)
@@ -154,7 +167,9 @@ namespace Warehouse.DAL.Repositories
 
                         MinStock = Convert.ToInt32(reader["MinStock"]),
 
-                        SupplierId = Convert.ToInt32(reader["SupplierId"])
+                        SupplierId = reader["SupplierId"] == DBNull.Value
+                            ? 0
+                            : Convert.ToInt32(reader["SupplierId"])
                     };
                 }
             }

@@ -34,6 +34,10 @@ IF OBJECT_ID('Suppliers', 'U') IS NOT NULL
     DROP TABLE Suppliers
 GO
 
+IF OBJECT_ID('Users', 'U') IS NOT NULL
+    DROP TABLE Users
+GO
+
 -- =============================================
 -- BẢNG NHÀ CUNG CẤP
 -- =============================================
@@ -206,6 +210,12 @@ BEGIN
         Address = @Address
     WHERE SupplierId = @SupplierId
 
+    IF @@ROWCOUNT = 0
+    BEGIN
+        RAISERROR(N'Nhà cung cấp không tồn tại',16,1)
+        RETURN
+    END
+
 END
 GO
 
@@ -221,6 +231,12 @@ BEGIN
 
     DELETE FROM Suppliers
     WHERE SupplierId = @SupplierId
+
+    IF @@ROWCOUNT = 0
+    BEGIN
+        RAISERROR(N'Nhà cung cấp không tồn tại',16,1)
+        RETURN
+    END
 
 END
 GO
@@ -239,6 +255,17 @@ CREATE OR ALTER PROCEDURE sp_AddProduct
 )
 AS
 BEGIN
+    IF @Quantity < 0 OR @Price < 0 OR @MinStock < 0
+    BEGIN
+        RAISERROR(N'Số lượng, giá và tồn tối thiểu không được âm',16,1)
+        RETURN
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Suppliers WHERE SupplierId = @SupplierId)
+    BEGIN
+        RAISERROR(N'Nhà cung cấp không tồn tại',16,1)
+        RETURN
+    END
 
     INSERT INTO Products
     (
@@ -301,6 +328,17 @@ CREATE OR ALTER PROCEDURE sp_UpdateProduct
 )
 AS
 BEGIN
+    IF @Quantity < 0 OR @Price < 0 OR @MinStock < 0
+    BEGIN
+        RAISERROR(N'Số lượng, giá và tồn tối thiểu không được âm',16,1)
+        RETURN
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Suppliers WHERE SupplierId = @SupplierId)
+    BEGIN
+        RAISERROR(N'Nhà cung cấp không tồn tại',16,1)
+        RETURN
+    END
 
     UPDATE Products
     SET
@@ -311,6 +349,12 @@ BEGIN
         MinStock = @MinStock,
         SupplierId = @SupplierId
     WHERE ProductId = @ProductId
+
+    IF @@ROWCOUNT = 0
+    BEGIN
+        RAISERROR(N'Sản phẩm không tồn tại',16,1)
+        RETURN
+    END
 
 END
 GO
@@ -328,6 +372,12 @@ BEGIN
     DELETE FROM Products
     WHERE ProductId = @ProductId
 
+    IF @@ROWCOUNT = 0
+    BEGIN
+        RAISERROR(N'Sản phẩm không tồn tại',16,1)
+        RETURN
+    END
+
 END
 GO
 
@@ -342,6 +392,17 @@ CREATE OR ALTER PROCEDURE sp_ImportStock
 )
 AS
 BEGIN
+    IF @Quantity <= 0
+    BEGIN
+        RAISERROR(N'Số lượng nhập phải lớn hơn 0',16,1)
+        RETURN
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Products WHERE ProductId = @ProductId)
+    BEGIN
+        RAISERROR(N'Sản phẩm không tồn tại',16,1)
+        RETURN
+    END
 
     BEGIN TRY
 
@@ -392,16 +453,15 @@ CREATE OR ALTER PROCEDURE sp_ExportStock
 )
 AS
 BEGIN
-
-    DECLARE @CurrentStock INT
-
-    SELECT @CurrentStock = Quantity
-    FROM Products
-    WHERE ProductId = @ProductId
-
-    IF(@CurrentStock < @Quantity)
+    IF @Quantity <= 0
     BEGIN
-        RAISERROR(N'Không đủ hàng trong kho',16,1)
+        RAISERROR(N'Số lượng xuất phải lớn hơn 0',16,1)
+        RETURN
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM Products WHERE ProductId = @ProductId)
+    BEGIN
+        RAISERROR(N'Sản phẩm không tồn tại',16,1)
         RETURN
     END
 
@@ -412,6 +472,14 @@ BEGIN
         UPDATE Products
         SET Quantity = Quantity - @Quantity
         WHERE ProductId = @ProductId
+            AND Quantity >= @Quantity
+
+        IF @@ROWCOUNT = 0
+        BEGIN
+            RAISERROR(N'Không đủ hàng trong kho',16,1)
+            ROLLBACK TRAN
+            RETURN
+        END
 
         INSERT INTO StockLogs
         (
@@ -531,7 +599,7 @@ BEGIN
     SELECT
         COUNT(*) AS TotalProducts,
 
-        SUM(Quantity) AS TotalStock,
+        ISNULL(SUM(Quantity),0) AS TotalStock,
 
         (
             SELECT COUNT(*)
@@ -578,29 +646,6 @@ BEGIN
 
 END
 GO
---tÌM KIẾM  
-CREATE OR ALTER PROCEDURE sp_SearchProducts
-(
-    @Keyword NVARCHAR(100)
-)
-AS
-BEGIN
-
-    SELECT
-        ProductId,
-        SKU,
-        ProductName,
-        Quantity,
-        Price,
-        MinStock,
-        SupplierId
-    FROM Products
-    WHERE
-        ProductName LIKE '%' + @Keyword + '%'
-        OR SKU LIKE '%' + @Keyword + '%'
-
-END
-GO
 --pHÂN TRANG SẢN PHẨM
 CREATE OR ALTER PROCEDURE sp_GetProductsPaging
 (
@@ -609,6 +654,11 @@ CREATE OR ALTER PROCEDURE sp_GetProductsPaging
 )
 AS
 BEGIN
+    IF @Page <= 0 OR @PageSize <= 0
+    BEGIN
+        RAISERROR(N'Trang và kích thước trang phải lớn hơn 0',16,1)
+        RETURN
+    END
 
     SELECT
         ProductId,
@@ -652,9 +702,9 @@ BEGIN
             END
         ) AS TotalExport
 
-    FROM StockLogs sl
+    FROM Products p
 
-    INNER JOIN Products p
+    LEFT JOIN StockLogs sl
         ON sl.ProductId = p.ProductId
 
     GROUP BY p.ProductName

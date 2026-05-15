@@ -22,10 +22,12 @@ namespace Warehouse.BLL.Services
             string note
         )
         {
+            ValidateStockMovement(productId, quantity);
+
             _stockRepository.ImportStock(
                 productId,
                 quantity,
-                note
+                note ?? string.Empty
             );
         }
 
@@ -35,10 +37,12 @@ namespace Warehouse.BLL.Services
             string note
         )
         {
+            ValidateStockMovement(productId, quantity);
+
             _stockRepository.ExportStock(
                 productId,
                 quantity,
-                note
+                note ?? string.Empty
             );
         }
 
@@ -63,11 +67,21 @@ namespace Warehouse.BLL.Services
 
         public List<Product> Search(string keyword)
         {
-            return _stockRepository.Search(keyword);
+            return _stockRepository.Search(keyword ?? string.Empty);
         }
 
         public List<Product> Paging( int page,int pageSize)
         {
+            if (page <= 0)
+            {
+                throw new ArgumentException("Page must be greater than 0");
+            }
+
+            if (pageSize <= 0)
+            {
+                throw new ArgumentException("Page size must be greater than 0");
+            }
+
             return _stockRepository.Paging(
                 page,
                 pageSize
@@ -77,6 +91,19 @@ namespace Warehouse.BLL.Services
         public object GetReport()
         {
             return _stockRepository.GetReport();
+        }
+
+        private static void ValidateStockMovement(int productId, int quantity)
+        {
+            if (productId <= 0)
+            {
+                throw new ArgumentException("Product id must be greater than 0");
+            }
+
+            if (quantity <= 0)
+            {
+                throw new ArgumentException("Quantity must be greater than 0");
+            }
         }
     }
 }

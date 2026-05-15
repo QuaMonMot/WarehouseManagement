@@ -29,13 +29,20 @@ namespace Warehouse.API.Controllers
             [FromBody] ImportStockDTO dto
         )
         {
-            _stockService.ImportStock(
-                dto.ProductId,
-                dto.Quantity,
-                dto.Note
-            );
+            try
+            {
+                _stockService.ImportStock(
+                    dto.ProductId,
+                    dto.Quantity,
+                    dto.Note
+                );
 
-            return Ok("Import success");
+                return Ok("Import success");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // =========================
@@ -49,13 +56,20 @@ namespace Warehouse.API.Controllers
             [FromBody] ExportStockDTO dto
         )
         {
-            _stockService.ExportStock(
-                dto.ProductId,
-                dto.Quantity,
-                dto.Note
-            );
+            try
+            {
+                _stockService.ExportStock(
+                    dto.ProductId,
+                    dto.Quantity,
+                    dto.Note
+                );
 
-            return Ok("Export success");
+                return Ok("Export success");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // =========================
@@ -142,12 +156,19 @@ namespace Warehouse.API.Controllers
             int pageSize = 5
         )
         {
-            return Ok(
-                _stockService.Paging(
-                    page,
-                    pageSize
-                )
-            );
+            try
+            {
+                return Ok(
+                    _stockService.Paging(
+                        page,
+                        pageSize
+                    )
+                );
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // =========================

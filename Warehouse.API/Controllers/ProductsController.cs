@@ -36,9 +36,21 @@ namespace Warehouse.API.Controllers
         [EndpointSummary("Lấy sản phẩm theo ID")]
         public IActionResult GetById(int id)
         {
-            var product = _productService.GetById(id);
+            try
+            {
+                var product = _productService.GetById(id);
 
-            return Ok(product);
+                if (product == null)
+                {
+                    return NotFound("Product not found");
+                }
+
+                return Ok(product);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // =========================
@@ -112,6 +124,10 @@ namespace Warehouse.API.Controllers
 
                 return Ok("Update success");
             }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
@@ -126,9 +142,24 @@ namespace Warehouse.API.Controllers
         [EndpointSummary("Xóa sản phẩm")]
         public IActionResult Delete(int id)
         {
-            _productService.Delete(id);
+            try
+            {
+                _productService.Delete(id);
 
-            return Ok("Delete success");
+                return Ok("Delete success");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

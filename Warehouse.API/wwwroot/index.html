@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Warehouse Management</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div>
+                    <strong>Warehouse</strong>
+                    <small>Management</small>
+                </div>
+            </div>
+
+            <nav class="nav-tabs" aria-label="Điều hướng">
+                <button class="nav-tab active" data-view="dashboard" type="button">Tổng quan</button>
+                <button class="nav-tab" data-view="products" type="button">Sản phẩm</button>
+                <button class="nav-tab" data-view="suppliers" type="button">Nhà cung cấp</button>
+                <button class="nav-tab" data-view="stock" type="button">Kho hàng</button>
+            </nav>
+
+            <div class="side-panel">
+                <span class="status-dot"></span>
+                <div>
+                    <strong id="apiStatus">Đang kết nối</strong>
+                    <small>API nội bộ</small>
+                </div>
+            </div>
+        </aside>
+
+        <main class="workspace">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">Quản lý kho hàng</p>
+                    <h1 id="viewTitle">Tổng quan</h1>
+                </div>
+                <div class="topbar-actions">
+                    <button id="refreshBtn" class="icon-button" type="button" title="Tải lại dữ liệu" aria-label="Tải lại dữ liệu">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v6h-6"/></svg>
+                    </button>
+                </div>
+            </header>
+
+            <section id="alert" class="alert" hidden></section>
+
+            <section class="view active" id="dashboardView" data-title="Tổng quan">
+                <div class="hero-band">
+                    <div>
+                        <p class="eyebrow">Tồn kho hôm nay</p>
+                        <h2>Kiểm soát nhập xuất, tồn thấp và lịch sử kho trong một màn hình.</h2>
+                    </div>
+                    <div class="warehouse-visual" aria-hidden="true">
+                        <div class="rack rack-one"></div>
+                        <div class="rack rack-two"></div>
+                        <div class="forklift"></div>
+                    </div>
+                </div>
+
+                <div class="metric-grid">
+                    <article class="metric">
+                        <span>Tổng sản phẩm</span>
+                        <strong id="totalProducts">0</strong>
+                    </article>
+                    <article class="metric">
+                        <span>Tổng tồn kho</span>
+                        <strong id="totalStock">0</strong>
+                    </article>
+                    <article class="metric warning">
+                        <span>Sắp hết hàng</span>
+                        <strong id="lowStockProducts">0</strong>
+                    </article>
+                    <article class="metric">
+                        <span>Nhập / Xuất</span>
+                        <strong><span id="totalImport">0</span> / <span id="totalExport">0</span></strong>
+                    </article>
+                </div>
+
+                <div class="content-grid">
+                    <section class="panel">
+                        <div class="panel-header">
+                            <h2>Tồn kho thấp</h2>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>SKU</th>
+                                        <th>Sản phẩm</th>
+                                        <th>Tồn</th>
+                                        <th>Tối thiểu</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lowStockTable"></tbody>
+                            </table>
+                        </div>
+                    </section>
+                    <section class="panel">
+                        <div class="panel-header">
+                            <h2>Lịch sử gần đây</h2>
+                        </div>
+                        <div class="activity-list" id="historyList"></div>
+                    </section>
+                </div>
+            </section>
+
+            <section class="view" id="productsView" data-title="Sản phẩm">
+                <div class="toolbar">
+                    <label class="search-box">
+                        <span>Tìm</span>
+                        <input id="productSearch" type="search" placeholder="SKU hoặc tên sản phẩm">
+                    </label>
+                    <button id="clearProductForm" class="secondary-button" type="button">Làm mới</button>
+                </div>
+
+                <div class="content-grid wide-left">
+                    <section class="panel">
+                        <div class="panel-header">
+                            <h2>Danh sách sản phẩm</h2>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>SKU</th>
+                                        <th>Tên</th>
+                                        <th>Tồn</th>
+                                        <th>Giá</th>
+                                        <th>Min</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsTable"></tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section class="panel">
+                        <div class="panel-header">
+                            <h2 id="productFormTitle">Thêm sản phẩm</h2>
+                        </div>
+                        <form id="productForm" class="form-grid">
+                            <input type="hidden" id="productId">
+                            <label>SKU<input id="productSku" required></label>
+                            <label>Tên sản phẩm<input id="productName" required></label>
+                            <label>Số lượng<input id="productQuantity" type="number" min="0" required></label>
+                            <label>Giá<input id="productPrice" type="number" min="0" step="0.01" required></label>
+                            <label>Tồn tối thiểu<input id="productMinStock" type="number" min="0" required></label>
+                            <label>Nhà cung cấp<select id="productSupplier" required></select></label>
+                            <button class="primary-button" type="submit">Lưu sản phẩm</button>
+                        </form>
+                    </section>
+                </div>
+            </section>
+
+            <section class="view" id="suppliersView" data-title="Nhà cung cấp">
+                <div class="content-grid wide-left">
+                    <section class="panel">
+                        <div class="panel-header">
+                            <h2>Danh sách nhà cung cấp</h2>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Mã</th>
+                                        <th>Tên</th>
+                                        <th>Điện thoại</th>
+                                        <th>Địa chỉ</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="suppliersTable"></tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section class="panel">
+                        <div class="panel-header">
+                            <h2 id="supplierFormTitle">Thêm nhà cung cấp</h2>
+                        </div>
+                        <form id="supplierForm" class="form-grid">
+                            <input type="hidden" id="supplierId">
+                            <label>Mã nhà cung cấp<input id="supplierCode" required></label>
+                            <label>Tên nhà cung cấp<input id="supplierName" required></label>
+                            <label>Điện thoại<input id="supplierPhone"></label>
+                            <label>Địa chỉ<input id="supplierAddress"></label>
+                            <button class="primary-button" type="submit">Lưu nhà cung cấp</button>
+                            <button id="clearSupplierForm" class="secondary-button" type="button">Làm mới</button>
+                        </form>
+                    </section>
+                </div>
+            </section>
+
+            <section class="view" id="stockView" data-title="Kho hàng">
+                <div class="content-grid">
+                    <section class="panel">
+                        <div class="panel-header">
+                            <h2>Nhập kho</h2>
+                        </div>
+                        <form id="importForm" class="form-grid">
+                            <label>Sản phẩm<select id="importProduct" required></select></label>
+                            <label>Số lượng<input id="importQuantity" type="number" min="1" required></label>
+                            <label>Ghi chú<input id="importNote"></label>
+                            <button class="primary-button" type="submit">Nhập kho</button>
+                        </form>
+                    </section>
+
+                    <section class="panel">
+                        <div class="panel-header">
+                            <h2>Xuất kho</h2>
+                        </div>
+                        <form id="exportForm" class="form-grid">
+                            <label>Sản phẩm<select id="exportProduct" required></select></label>
+                            <label>Số lượng<input id="exportQuantity" type="number" min="1" required></label>
+                            <label>Ghi chú<input id="exportNote"></label>
+                            <button class="primary-button danger" type="submit">Xuất kho</button>
+                        </form>
+                    </section>
+                </div>
+
+                <section class="panel">
+                    <div class="panel-header">
+                        <h2>Báo cáo nhập xuất</h2>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>Tổng nhập</th>
+                                    <th>Tổng xuất</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportTable"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

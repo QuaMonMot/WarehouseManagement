@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System.Configuration;
 using Microsoft.Data.SqlClient;
 
 namespace Warehouse.DAL.DbContext
@@ -17,6 +16,9 @@ namespace Warehouse.DAL.DbContext
         {
             return new SqlConnection(
                 _configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException(
+                    "DefaultConnection is not configured"
+                )
             );
         }
     }

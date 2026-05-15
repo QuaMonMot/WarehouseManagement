@@ -39,9 +39,21 @@ namespace Warehouse.API.Controllers
 
         public IActionResult GetById(int id)
         {
-            return Ok(
-                _supplierService.GetById(id)
-            );
+            try
+            {
+                var supplier = _supplierService.GetById(id);
+
+                if (supplier == null)
+                {
+                    return NotFound("Supplier not found");
+                }
+
+                return Ok(supplier);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // =========================
@@ -54,20 +66,27 @@ namespace Warehouse.API.Controllers
             [FromBody] CreateSupplierDTO dto
         )
         {
-            Supplier supplier = new Supplier
+            try
             {
-                SupplierCode = dto.SupplierCode,
+                Supplier supplier = new Supplier
+                {
+                    SupplierCode = dto.SupplierCode,
 
-                SupplierName = dto.SupplierName,
+                    SupplierName = dto.SupplierName,
 
-                Phone = dto.Phone,
+                    Phone = dto.Phone,
 
-                Address = dto.Address
-            };
+                    Address = dto.Address
+                };
 
-            _supplierService.Add(supplier);
+                _supplierService.Add(supplier);
 
-            return Ok("Add success");
+                return Ok("Add success");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // =========================
@@ -81,22 +100,33 @@ namespace Warehouse.API.Controllers
             [FromBody] UpdateSupplierDTO dto
         )
         {
-            Supplier supplier = new Supplier
+            try
             {
-                SupplierId = id,
+                Supplier supplier = new Supplier
+                {
+                    SupplierId = id,
 
-                SupplierCode = dto.SupplierCode,
+                    SupplierCode = dto.SupplierCode,
 
-                SupplierName = dto.SupplierName,
+                    SupplierName = dto.SupplierName,
 
-                Phone = dto.Phone,
+                    Phone = dto.Phone,
 
-                Address = dto.Address
-            };
+                    Address = dto.Address
+                };
 
-            _supplierService.Update(supplier);
+                _supplierService.Update(supplier);
 
-            return Ok("Update success");
+                return Ok("Update success");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // =========================
@@ -107,9 +137,20 @@ namespace Warehouse.API.Controllers
 
         public IActionResult Delete(int id)
         {
-            _supplierService.Delete(id);
+            try
+            {
+                _supplierService.Delete(id);
 
-            return Ok("Delete success");
+                return Ok("Delete success");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

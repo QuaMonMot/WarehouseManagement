@@ -24,9 +24,7 @@ builder.Services.AddScoped<SqlConnectionFactory>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
-builder.Services.AddScoped< ISupplierRepository, SupplierRepository>();
-builder.Services.AddScoped<IStockRepository,StockRepository>();
-builder.Services.AddScoped< IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 
 
@@ -35,9 +33,11 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
-builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 //Authentication
+var jwtKey = builder.Configuration["Jwt:Key"]
+    ?? throw new InvalidOperationException("Jwt:Key is not configured");
+
 builder.Services.AddAuthentication(
     JwtBearerDefaults.AuthenticationScheme
 )
@@ -63,7 +63,7 @@ builder.Services.AddAuthentication(
             IssuerSigningKey =
                 new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(
-                        builder.Configuration["Jwt:Key"]
+                        jwtKey
                     )
                 )
         };
@@ -85,6 +85,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 
